@@ -1,0 +1,27 @@
+Subject	Relation	Object
+H5	subsystem	powertrain
+H5	subsystem	body
+H5	subsystem	chasis
+H5	subsystem	electric
+powertrain	component	engine
+powertrain	component	driveshaft
+powertrain	component	gearbox
+chasis	component	axle
+chasis	component	wheel
+body	component	door
+body	component	frame
+body	component	bonet
+H5	VIN	1HGBH41JXMN109186
+H5	VIN	1HGBH41JXMN109187
+H3	VIN	1HGBH41JXMN109188
+1HGBH41JXMN109188	production date	2021/3/18
+1HGBH41JXMN109188	production location	Birmingham
+1HGBH41JXMN109187	production date	2021/3/19
+1HGBH41JXMN109187	production location	Sheffield
+1HGBH41JXMN109186	production date	2021/3/19
+1HGBH41JXMN109186	production location	Sheffield
+vehicle	model	H5
+vehicle	model	H5
+vehicle	model	H3
+powertrain	part number	N600329182
+powertrain	serial number	sh021923
