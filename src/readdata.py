@@ -13,7 +13,7 @@ def read_to_triple(filename):
     return list_of_triples
 
 # test the function 
-cwd=os.getcwd()
-filepath=os.path.join(cwd,'data\\triple_sample1.csv')
-print(filepath)
-print(read_to_triple(filepath))
+##cwd=os.getcwd()
+#filepath=os.path.join(cwd,'data\\triple_sample1.csv')
+#print(filepath)
+#print(read_to_triple(filepath))
