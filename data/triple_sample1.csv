@@ -1,27 +1,11 @@
-Subject	Relation	Object
-H5	subsystem	powertrain
-H5	subsystem	body
-H5	subsystem	chasis
-H5	subsystem	electric
-powertrain	component	engine
-powertrain	component	driveshaft
-powertrain	component	gearbox
-chasis	component	axle
-chasis	component	wheel
-body	component	door
-body	component	frame
-body	component	bonet
-H5	VIN	1HGBH41JXMN109186
-H5	VIN	1HGBH41JXMN109187
-H3	VIN	1HGBH41JXMN109188
-1HGBH41JXMN109188	production date	2021/3/18
-1HGBH41JXMN109188	production location	Birmingham
-1HGBH41JXMN109187	production date	2021/3/19
-1HGBH41JXMN109187	production location	Sheffield
-1HGBH41JXMN109186	production date	2021/3/19
-1HGBH41JXMN109186	production location	Sheffield
-vehicle	model	H5
-vehicle	model	H5
-vehicle	model	H3
-powertrain	part number	N600329182
-powertrain	serial number	sh021923
+Subject ,Relation,Object
+Radiator,Subsystem,Engine Accessory
+Engine Accessory,Subsystem,Powertrain
+Radiator,Regulation,BS0232123
+BS0232123,Name,Design Specification of Radiator
+Radiator,Cooling Capacity,C=1.2Q
+Radiator,Minimum Strength,2.5Mpa
+C=1.2Q,Parameter,Engine Heat
+C00123456,Type,Radiator
+C00123456,Strength,2.6pa
+C00123456,Cooling Capacity,25kJ

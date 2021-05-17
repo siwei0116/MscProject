@@ -4,7 +4,7 @@ import os
 
 def read_to_triple(filename):
     fhand=open(filename)
-    csvreader=csv.reader(fhand,delimiter='\t')
+    csvreader=csv.reader(fhand)
     next(csvreader)  #skip the first row of the csv file.
     list_of_triples=[]
     for row in csvreader:
