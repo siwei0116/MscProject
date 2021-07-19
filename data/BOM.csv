@@ -1,7 +1,0 @@
-Part Number,Part Name,Supplier,System,Contract Price,Inventory,Usage,Connection,Assembly Position,Design Engineer,Revision History,Test History,Failure Record
-10001,Engine,Cummings Inc,Powertrain,1500,334,SeriesA&A1,"[10011,Bolt]",A2B,Siwei Zhu,server/p/10001,server/test/10001,None
-10002,Electric Motor,CATL Inc,Powertrain,2000,400,SeriesA&A2,"[10012,Bolt]",A2B,Bob Wade,server/p/10002,server/test/10002,server/failure/10002
-10011,Engine Mount,ABL Inc,Powertrain,50,300,SeriesA&A1,"[10001,Bolt]",A2B,Chales Alex,server/p/10011,server/test/10011,server/failure/10011
-10012,Engine Mount,ABL Inc,Powertrain,30,200,SeriesA&A2,"[10002,Bolt]",A2B,Daniel Carlos,server/p/10012,server/test/10012,server/failure/10012
-10021,Chasis Type A,CSE Inc,Chasis,1000,302,,,,,,,
-10023,Chasis Type B,CSE Inc,Chasis,1000,252,,,,,,,
