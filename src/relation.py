@@ -2,6 +2,7 @@
 
 from py2neo import Node
 import pandas as pd
+import part_connections
 
 
 class Relation:
@@ -14,6 +15,48 @@ class Relation:
         self.startnodeType = startnodetype
         self.endnodeType = endnodetype
         self.bidirection = bidirection
+
+    @classmethod
+    def getsubClasses(cls):  # get all subclasses of a class
+        result = []
+        for subclass in cls.__subclasses__():
+            result.append(subclass)
+        return result
+
+    @classmethod
+    def getRelationLabel(cls):  # get all labels of the relations
+        result = [a.label for a in cls.getsubClasses()]
+        return result
+
+    @classmethod
+    def getRelationDict(cls):  # get the {label:class} dictionary of a relation
+        dic = {}
+        for a in cls.getsubClasses():
+            dic[a.label] = a
+        return dic
+
+    @classmethod
+    # get the equivalence(synonym) dictionary for relations
+    def getEquivalenceDict(cls):
+        dic = {}
+        for a in cls.getsubClasses():
+            for b in a.equivalence:
+                if b in dic:
+                    dic[b].append(a.label)
+                else:
+                    dic[b] = [a.label]
+        return dic
+
+    @classmethod
+    def getInverseDict(cls):  # get the inverse(antonym) dictionary for relations
+        dic = {}
+        for a in cls.getsubClasses():
+            for b in a.inverse:
+                if b in dic:
+                    dic[b].append(a.label)
+                else:
+                    dic[b] = [a.label]
+        return dic
 
     def __str__(self):
         if self.bidirection == False:
@@ -32,8 +75,8 @@ class fromStafftoDepartment(Relation):
     label = "works_in"
     startnodetype = "Staff"
     endnodetype = "Department"
-    inverse = ['']
-    equivalence = ['the personnel of', 'belong to']
+    inverse = []
+    equivalence = ['the personnel of', 'belong to', 'work for', 'work in']
 
     def __init__(self, staffID, department):
         super().__init__(self.startnodetype, self.endnodetype, staffID,
@@ -45,7 +88,7 @@ class fromStafftoRole(Relation):
     startnodetype = "Staff"
     endnodetype = "Role"
     inverse = ['have']
-    equivalence = ['is responsible for ', 'works as']
+    equivalence = ['is responsible for', 'work as']
 
     def __init__(self, staffID, role):
         super().__init__(self.startnodetype, self.endnodetype, staffID,
@@ -57,7 +100,7 @@ class fromAssemblytoComponent(Relation):
     startnodetype = "Assembly"
     endnodetype = "Component"
     inverse = ['composes']
-    equivalence = ['consists of', 'composed of']
+    equivalence = ['consist of', 'compose of']
 
     def __init__(self, assembly, component_number):
         super().__init__(self.startnodetype, self.endnodetype, assembly,
@@ -68,7 +111,7 @@ class fromAssemblytoSystem(Relation):
     label = "assemled_to"
     startnodetype = "Assembly"
     endnodetype = "System"
-    inverse = ['assembled by', 'consists of', 'composed of', 'compose']
+    inverse = ['assemble by', 'consist of', 'compose of', 'compose']
     equivalence = []
 
     def __init__(self, assembly, system):
@@ -80,7 +123,7 @@ class fromSystemtoModel(Relation):
     label = "system_of"
     startnodetype = "System"
     endnodetype = "Product"
-    inverse = ['assembled by', 'consists of', 'composed of', 'compose']
+    inverse = ['assemble by', 'consist of', 'compose of', 'compose']
     equivalence = []
 
     def __init__(self, system, product):
@@ -91,7 +134,7 @@ class fromComponenttoStaff(Relation):
     label = "designed_by"
     startnodetype = "Component"
     endnodetype = "Staff"
-    inverse = ['design']
+    inverse = ['design', 'designed']
     equivalence = []
 
     def __init__(self, component, staff):
@@ -103,7 +146,7 @@ class fromComponenttoSupplier(Relation):
     startnodetype = "Component"
     endnodetype = "Supplier"
     inverse = ['supply']
-    equivalence = ['purchased from', "supplied by"]
+    equivalence = ['purchase from', "supply by"]
 
     def __init__(self, component, supplier):
         super().__init__(self.startnodetype, self.endnodetype, component, supplier, self.label)
@@ -119,6 +162,18 @@ class fromComponenttoWorkstation(Relation):
     def __init__(self, component, workstation):
         super().__init__(self.startnodetype, self.endnodetype,
                          component, workstation, self.label)
+
+
+class fromComponenttoComponent(Relation):
+    label = "Connected_with"
+    startnodetype = "Component"
+    endnodetype = "Component"
+    equivalence = ['linked_with']
+
+    def __init__(self, component1, component2, connectionType):
+        self.connectionType = connectionType
+        super().__init__(self.startnodetype, self.endnodetype,
+                         component1, component2, self.label, bidirection=True, connection_type=connectionType)
 
 
 class Relations:
@@ -166,6 +221,10 @@ class Relations:
         r = fromSystemtoModel(systemName, modelName)
         self.rel_systemtoModel.append(r)
 
+    def addComponentConnection(self, component1, component2, connectionType):
+        r = fromComponenttoComponent(component1, component2, connectionType)
+        self.rel_componentConnectedto.append(r)
+
     def extractStaffRelation(self, datafile):
         print("Extracting staff-department relationship from the file...")
         datafile = pd.read_excel(
@@ -203,14 +262,28 @@ class Relations:
         for v in systemName:
             self.addSystemtoModel(v, 'Model A')
 
+    def extractComponentConnection(self, connectionList=part_connections.component_connection_list()):
+        for connection_pair in connectionList:
+            component1 = connection_pair[0]
+            component2 = connection_pair[1]
+            connectiontype = connection_pair[2]
+            self.addComponentConnection(component1, component2, connectiontype)
+
     def extractAllRelation(self, datafile):
         self.extractStaffRelation(datafile)
         self.extractcomponentRelation(datafile)
         self.extractSystemtoModel(datafile)
+        self.extractComponentConnection()
+
+    def allRelations(self):
+        return self.rel_assemblytoComponent+self.rel_assemblytoSystem +\
+            self.rel_componentAssembliedat+self.rel_componentConnectedto +\
+            self.rel_componentDesignedby+self.rel_componentSuppliedby +\
+            self.rel_stafftoDepartment+self.rel_stafftoRole+self.rel_systemtoModel
 
 
 if __name__ == "__main__":
     e = Relations()
     datafile = pd.ExcelFile("./data/Data.xlsx")
     e.extractAllRelation(datafile)
-    print(e.rel_componentDesignedby)
+    print(e.rel_componentConnectedto)

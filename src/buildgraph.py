@@ -26,45 +26,34 @@ class BuildGraph:
         # delete all nodes and edges in the Neo4j Graph database
         self.g.delete_all()
 
-    def createRelations(self, startLabel, endLabel, *relations):
-        # create a relation (edge) between nodes in the Neor4j database
-        # TODO  to be refactored to get rid of the startLabel and endLabel arguments(which can be extrated from the relations object)
+    def createRelations(self, *relations):
+        '''create a relationship on the neo4j graph'''
+        labeldict = et.Entities.labeldic()
         for r in relations:
             if r.bidirection == False:
                 query = f"match(p:{r.startnodeType}) " +\
                     f"match (q:{r.endnodeType}) " +\
-                    f"where p.{startLabel} = '{r.startnodeID}' and q.{endLabel} = '{r.endnodeID}' " +\
+                    f"where p.{labeldict[r.startnodetype]} = '{r.startnodeID}' and q.{labeldict[r.endnodetype]} = '{r.endnodeID}' " +\
                     f"merge(p)-[r:{r.relationType}] -> (q) "
             else:
                 query = f"match(p: {r.startnodeType}) " +\
                     f"match(q: {r.endnodeType}) " +\
-                    f"where p.{startLabel} = '{r.startnodeID}' and q.{endLabel} = '{r.endnodeID}' " +\
+                    f"where p.{labeldict[r.startnodetype]} = '{r.startnodeID}' and q.{labeldict[r.endnodetype]} = '{r.endnodeID}' " +\
                     f"merge(p)-[r:{r.relationType}]-(q)"
             for k, v in r.property.items():
                 addQuery = f"set r.{k}='{v}'\n "
-                query = addQuery+query
+                query = query + " " + addQuery
             self.g.run(query)
             print(query)
 
     def initialize(self):
-        # clear the graph database
+        '''initialize the neo4j knowledge graph using the data(nodes and edges) assigned to the graph atrributes '''
+        # clear the graph
         self.deleteAll()
         # create all nodes in the Neo4j database
         self.createNodes(*self.nodes.allnodes())
         # create edges in the Neo4j database TODO (to be refactored as the first two arguments are not needed)
-        self.createRelations("StaffID", "Name",
-                             *self.edges.rel_stafftoDepartment)
-        self.createRelations("StaffID", "Name", *self.edges.rel_stafftoRole)
-        self.createRelations("Name", "Component_Number",
-                             *self.edges.rel_assemblytoComponent)
-        self.createRelations("Component_Number", "StaffID",
-                             *self.edges.rel_componentDesignedby)
-        self.createRelations("Component_Number", "SupplierID",
-                             *self.edges.rel_componentSuppliedby)
-        self.createRelations("Component_Number", "WorkstationID",
-                             *self.edges.rel_componentAssembliedat)
-        self.createRelations("Name", "Name", *self.edges.rel_assemblytoSystem)
-        self.createRelations("Name", "Name", *self.edges.rel_systemtoModel)
+        self.createRelations(*self.edges.allRelations())
 
 
 if __name__ == "__main__":

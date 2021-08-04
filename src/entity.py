@@ -7,8 +7,30 @@ from py2neo import Node
 # A node takes a dictionary(key-value pairs) to store properties
 
 
-class Component(Node):  # Define a component node type
-    identified_By = "Component_Number"  # The name of unique ID label for the node
+class myNode(Node):
+    @classmethod
+    def getsubClasses(cls):
+        result = []
+        for subclass in cls.__subclasses__():
+            result.append(subclass)
+        return result
+
+    @classmethod
+    def getNodeTypeList(cls):
+        result = [a.nodeType for a in cls.getsubClasses()]
+        return result
+
+    @classmethod
+    def getNodeDict(cls):
+        dic = {}
+        for a in cls.getsubClasses():
+            for b in a.equivalence:
+                dic[b] = a.nodeType
+        return dic
+
+
+class Component(myNode):  # Define a component node type
+    identified_by = "Component_Number"  # The name of unique ID label for the node
     nodeType = "Component"
     # The equivalent expressions for the node
     equivalence = ["component", "part"]
@@ -24,7 +46,7 @@ class Component(Node):  # Define a component node type
         super().__init__(self.nodeType, **self.nodeProperties)
 
 
-class ComponentSystem(Node):  # Define a system node type
+class ComponentSystem(myNode):  # Define a system node type
     identified_by = "Name"
     nodeType = "System"
     equivalence = ["system", "subsystem"]
@@ -35,7 +57,7 @@ class ComponentSystem(Node):  # Define a system node type
         super().__init__(self.nodeType, **self.nodeProperties)
 
 
-class Staff(Node):  # Define a staff node type
+class Staff(myNode):  # Define a staff node type
     identified_by = "StaffID"
     nodeType = "Staff"
     equivalence = ["Employee"]
@@ -47,7 +69,7 @@ class Staff(Node):  # Define a staff node type
         super().__init__(self.nodeType, **self.nodeProperties)
 
 
-class Supplier(Node):  # Define a supplier node type
+class Supplier(myNode):  # Define a supplier node type
     identified_by = "SupplierID"
     nodeType = "Supplier"
     equivalence = ["supplier", "company", "seller"]
@@ -59,7 +81,7 @@ class Supplier(Node):  # Define a supplier node type
         super().__init__(self.nodeType, **self.nodeProperties)
 
 
-class Workstation(Node):  # Define a workstation node type
+class Workstation(myNode):  # Define a workstation node type
     identified_by = "WorkstationID"
     nodeType = "Workstation"
     equivalence = ["workstation", "assembly position"]
@@ -70,7 +92,7 @@ class Workstation(Node):  # Define a workstation node type
         super().__init__(self.nodeType, **self.nodeProperties)
 
 
-class Assembly(Node):  # Define an assembly node type, an assembly is a cluster of components (the bom structure is component-assembly-system-product)
+class Assembly(myNode):  # Define an assembly node type, an assembly is a cluster of components (the bom structure is component-assembly-system-product)
     identified_by = "Name"
     nodeType = "Assembly"
     equivalence = ["module", "assembly"]
@@ -81,7 +103,7 @@ class Assembly(Node):  # Define an assembly node type, an assembly is a cluster 
         super().__init__(self.nodeType, **self.nodeProperties)
 
 
-class Department(Node):  # Define a department node type
+class Department(myNode):  # Define a department node type
     identified_by = "Name"
     nodeType = "Department"
     equivalence = ["department", "division"]
@@ -92,10 +114,10 @@ class Department(Node):  # Define a department node type
         super().__init__(self.nodeType, **self.nodeProperties)
 
 
-class Role(Node):  # Define a Role(eg. Design engineer) node type
+class Role(myNode):  # Define a Role(eg. Design engineer) node type
     identified_by = "Name"
     nodeType = "Role"
-    Equivalence = ['job', 'title', 'position', 'role']
+    equivalence = ['job', 'title', 'position', 'role']
 
     def __init__(self, role):
         self.nodeProperties = {}
@@ -103,10 +125,10 @@ class Role(Node):  # Define a Role(eg. Design engineer) node type
         super().__init__(self.nodeType, **self.nodeProperties)
 
 
-class Product(Node):  # Define a Product(eg. Model A) node type
+class Product(myNode):  # Define a Product(eg. Model A) node type
     identified_by = "Name"
     nodeType = "Product"
-    Equivalence = ["model", "product"]
+    equivalence = ["model", "product"]
 
     def __init__(self, product, status):
         self.nodeProperties = {}
@@ -127,7 +149,16 @@ class Entities():  # Define a class whcih can store lists of all node types
     list_staffRole = []
     list_products = []
 
+    @classmethod
+    def labeldic(self):
+        '''return a dict for {Nodetype,Identity}'''
+        mydic = {}
+        for theNode in myNode.__subclasses__():
+            mydic[theNode.nodeType] = theNode.identified_by
+        return mydic
+
     # Transfer a node to a dictionary type (eg.{Label:"Component",Component_Number:"C0010001"})
+
     def nodeTodictionary(self, nodes):
         toDic = {}
         for k, v in nodes.items():
@@ -296,7 +327,8 @@ class Entities():  # Define a class whcih can store lists of all node types
 
 
 if __name__ == "__main__":
-    datafile = pd.ExcelFile("./data/Data.xlsx")
-    e = Entities()
-    e.extractAllNodes(datafile)
-    print(e.allnodes())
+    # datafile = pd.ExcelFile("./data/Data.xlsx")
+    # e = Entities()
+    # e.extractAllNodes(datafile)
+    # print(e.allnodes())
+    print(Entities.labeldic())

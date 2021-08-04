@@ -30,14 +30,26 @@ def parse_connection():
     pd_connectiondic.to_csv("./data/connectionparse.csv")
 
 
-def readconnections(typefile_path, connection_code):
-    # read a connection tuple, return the list of 'relationships
+def component_connection_list():
+    parsedconnections = []
+    datafile = pd.ExcelFile("./data/Data.xlsx")
+    mydata = pd.read_excel(
+        datafile, index_col=None, sheet_name='Electric Motor Systems')
+    connectionlist = mydata["Connection"].tolist()
+    connections = [literal_eval(i) for i in connectionlist]
+    components = mydata["Component Number"].tolist()
 
-    with open(typefile_path, 'r') as f:
+    with open("./data/part_connectiontype.json", 'r') as f:
         typedic = json.load(f)
-    connection_type = typedic[str(connection_code)]
-    return connection_type
+    for i in range(len(components)):
+        component1 = components[i]
+        for connection_pair in connections[i]:
+            component2 = connection_pair[1]
+            connectiontype = typedic[str(connection_pair[0])]
+            parsedconnections.append(
+                (component1, component2, connectiontype))
+    return parsedconnections
 
 
 if __name__ == '__main__':
-    print(readconnections('./Data/part_connectiontype.json', 1))
+    print(component_connection_list())
