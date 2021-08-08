@@ -19,8 +19,8 @@ def parse_connection():
     for column, series in pd_connection.iteritems():
         for row, v in series.items():
             if pd.notnull(v) and v != 'x' and v != 0:
-                connectiondic[column] = []
-                connectiondic[row] = []
+                connectiondic.setdefault(column, [])
+                connectiondic.setdefault(row, [])
                 connection_methods = str(v).split(',')
                 for method in connection_methods:
                     connectiondic[column].append((int(method), row))
@@ -52,4 +52,4 @@ def component_connection_list():
 
 
 if __name__ == '__main__':
-    print(component_connection_list())
+    parse_connection()

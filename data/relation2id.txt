@@ -1,0 +1,10 @@
+9
+consists_of 	 0
+works_as 	 1
+system_of 	 2
+Connected_with 	 3
+works_in 	 4
+supplied_by 	 5
+designed_by 	 6
+Assemblied_At 	 7
+assemled_to 	 8

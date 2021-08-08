@@ -39,7 +39,7 @@ class BuildGraph:
                 query = f"match(p: {r.startnodeType}) " +\
                     f"match(q: {r.endnodeType}) " +\
                     f"where p.{labeldict[r.startnodetype]} = '{r.startnodeID}' and q.{labeldict[r.endnodetype]} = '{r.endnodeID}' " +\
-                    f"merge(p)-[r:{r.relationType}]-(q)"
+                    f"merge(p)-[r:{r.relationType}]->(q)"
             for k, v in r.property.items():
                 addQuery = f"set r.{k}='{v}'\n "
                 query = query + " " + addQuery
